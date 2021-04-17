@@ -1,0 +1,77 @@
+table {
+    width: 100%;
+}
+
+.home-content .home-contact {
+    margin-top: 90px;
+}
+
+.navbar-default {
+    background-color: transparent;
+    border-color: transparent;
+    border-radius: 0;
+    padding-top: 20px;
+}
+
+.navbar-default {
+    background-color: #f8f8f8;
+    border-color: #e7e7e7;
+}
+
+
+
+    .navbar {
+        position: relative;
+        min-height: 50px;
+        margin-bottom: 20px;
+        border: 1px solid transparent;
+    }
+
+    article, aside, details, figcaption, figure, footer, header, hgroup, main, menu, nav, section, summary {
+        display: block;
+    }
+
+    *, *:before, *:after {
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+        /* direction: rtl; */
+    }
+
+    * {
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+    }
+
+
+
+    html, body {
+        font-size: 15px;
+        color: #565656;
+        width: 100%;
+        padding: 0;
+        margin-left: 0;
+        margin-right: 0;
+        font-weight: 300;
+    }
+
+    body {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        font-size: 14px;
+        line-height: 1.42857143;
+        color: #333;
+    }
+
+    .a.colored {
+        color: #C9C9C9;
+    }
+    .navbar-light .navbar-nav .nav-link {
+        color: white;
+    }
+    .navbar-light .navbar-nav .nav-link.active, .navbar-light .navbar-nav .show>.nav-link {
+        color: white;
+    }
+}
+
+
