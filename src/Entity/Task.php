@@ -33,6 +33,27 @@ class Task
      */
     private $user;
 
+    /**
+     * @ORM\ManyToOne(targetEntity=Objective::class, inversedBy="task")
+     * @ORM\JoinColumn(nullable=false)
+     */
+    private $objective;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $deadline_date;
+
+    /**
+     * @ORM\Column(type="datetime")
+     */
+    private $created;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $description;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -70,6 +91,54 @@ class Task
     public function setUser(?User $user): self
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    public function getObjective(): ?Objective
+    {
+        return $this->objective;
+    }
+
+    public function setObjective(?Objective $objective): self
+    {
+        $this->objective = $objective;
+
+        return $this;
+    }
+
+    public function getDeadlineDate(): ?\DateTimeInterface
+    {
+        return $this->deadline_date;
+    }
+
+    public function setDeadlineDate(\DateTimeInterface $deadline_date): self
+    {
+        $this->deadline_date = $deadline_date;
+
+        return $this;
+    }
+
+    public function getCreated(): ?\DateTimeInterface
+    {
+        return $this->created;
+    }
+
+    public function setCreated(\DateTimeInterface $created): self
+    {
+        $this->created = $created;
+
+        return $this;
+    }
+
+    public function getDescription(): ?string
+    {
+        return $this->description;
+    }
+
+    public function setDescription(string $description): self
+    {
+        $this->description = $description;
 
         return $this;
     }

@@ -41,9 +41,20 @@ class User implements UserInterface
      */
     private $tasks;
 
+    /**
+     * @ORM\OneToMany(targetEntity=Objective::class, mappedBy="user")
+     */
+    private $objectives;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $apiToken;
+
     public function __construct()
     {
         $this->tasks = new ArrayCollection();
+        $this->objectives = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -76,9 +87,9 @@ class User implements UserInterface
     /**
      * @see UserInterface
      */
-    public function getRoles(): array
+    public function getRoles()
     {
-        $roles = $this->roles;
+        $roles = array($this->roles);
         // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
 
@@ -153,6 +164,48 @@ class User implements UserInterface
                 $task->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|Objective[]
+     */
+    public function getObjectives(): Collection
+    {
+        return $this->objectives;
+    }
+
+    public function addObjective(Objective $objective): self
+    {
+        if (!$this->objectives->contains($objective)) {
+            $this->objectives[] = $objective;
+            $objective->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeObjective(Objective $objective): self
+    {
+        if ($this->objectives->removeElement($objective)) {
+            // set the owning side to null (unless already changed)
+            if ($objective->getUser() === $this) {
+                $objective->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getApiToken(): ?string
+    {
+        return $this->apiToken;
+    }
+
+    public function setApiToken(string $apiToken): self
+    {
+        $this->apiToken = $apiToken;
 
         return $this;
     }

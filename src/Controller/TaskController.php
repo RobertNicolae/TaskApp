@@ -2,15 +2,19 @@
 
 namespace App\Controller;
 
+use App\Entity\Objective;
 use App\Entity\Task;
 use App\Entity\User;
 use App\Form\TaskType;
+use App\Repository\ObjectiveRepository;
 use App\Repository\TaskRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Validator\Constraints\Date;
 
 /**
  * Class TaskController
@@ -41,7 +45,8 @@ class TaskController extends AbstractController
                 "name" => $task->getName(),
                 "status" => $task->getStatus(),
                 "id" => $task->getId(),
-                "username" => $task->getUser()->getEmail()
+                "username" => $task->getUser()->getEmail(),
+                "objective" => $task->getObjective()
             ];
         }
         return $this->json([
@@ -50,25 +55,46 @@ class TaskController extends AbstractController
     }
 
     /**
+     * @Route("/find/{id}")
+     * @param Task $task
+     */
+    public function findTaskBy(Task $task): JsonResponse
+    {
+
+        return $this->json([
+            "name" => $task->getName(),
+            "status" => $task->getStatus(),
+            "user" => $task->getUser()->getUsername(),
+            "description" => $task->getDescription(),
+            "deadline_date" => $task->getDeadlineDate()
+        ]);
+    }
+
+    /**
      * @Route("/create", name="create")
      * @param Request $request
+     * @param UserRepository $userRepository
+     * @param ObjectiveRepository $objectiveRepository
+     * @return JsonResponse
      */
-    public function createTask(Request $request, UserRepository $userRepository)
+    public function createTask(Request $request): JsonResponse
     {
         $body = $request->getContent();
         $data = json_decode($body, true);
 
+
         $task = new Task();
         $task->setStatus(0);
-        $user = $userRepository->findOneBy([
-            "id" => 1
-        ]);
-        $task->setUser($user);
+        $task->setCreated(new \DateTime());
+        $task->setUser($this->getUser());
+        $task->setDeadlineDate(\DateTime::createFromFormat('Y-m-d', $data["deadline_date"] ));
         $form = $this->createForm(TaskType::class, $task);
 
         $form->submit($data);
+
         if ($form->isSubmitted()) {
             $em = $this->getDoctrine()->getManager();
+
             $em->persist($task);
             $em->flush();
 
@@ -87,7 +113,7 @@ class TaskController extends AbstractController
      * @Route("/delete/{id}", name="delete")
      * @param Task $task
      */
-    public function deleteTask(Task $task)
+    public function deleteTask(Task $task): JsonResponse
     {
         if ($task) {
             $em = $this->getDoctrine()->getManager();
@@ -110,13 +136,18 @@ class TaskController extends AbstractController
      * @param Task $task
      * @param Request $request
      */
-    public function updateTask(Task $task, Request $request)
+    public function updateTask(Task $task, Request $request): JsonResponse
     {
         $body = $request->getContent();
         $data = json_decode($body, true);
 
 
         $form = $this->createForm(TaskType::class, $task);
+        if($data === null) {
+            return $this->json([
+                "message" => "Application Error"
+            ]);
+        }
         $form->submit($data);
 
         if ($form->isSubmitted()) {
@@ -141,9 +172,9 @@ class TaskController extends AbstractController
      * @Route("/mark/{id}", name="mark")
      * @param Request $request
      * @param TaskRepository $taskRepository
-     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @return JsonResponse
      */
-    public function markTask(Request $request, TaskRepository $taskRepository)
+    public function markTask(Request $request, TaskRepository $taskRepository): JsonResponse
     {
         $id = $request->get("id");
         $task = $taskRepository->findOneBy([
@@ -171,6 +202,33 @@ class TaskController extends AbstractController
             "message" => "Error"
         ]);
 
+
+    }
+
+    /**
+     * @Route("/get/{id}", name="get")
+     * @param Objective $objective
+     * @param TaskRepository $taskRepository
+     */
+    public function getTasksByObjective(Objective $objective, TaskRepository $taskRepository) {
+
+        $tasksFromDB = $taskRepository->findBy([
+            "objective" => $objective
+        ]);
+
+        $tasks = [];
+        foreach ($tasksFromDB as $task) {
+            $tasks[] = [
+                "name" => $task->getName(),
+                "status" => $task->getStatus(),
+                "id" => $task->getId(),
+                "username" => $task->getUser()->getEmail(),
+                "objective" => $task->getObjective()->getName()
+            ];
+        }
+        return $this->json([
+            "tasks" => $tasks
+        ]);
 
     }
 }
