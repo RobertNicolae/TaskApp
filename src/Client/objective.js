@@ -40,7 +40,7 @@ const addToGoogleCalendar = function (button) {
       code: localStorage.getItem('GoogleCode')
     },
     success: function (data) {
-
+    showAlert("success", "success", "Task added to Google Calendar")
     }
 
   })
